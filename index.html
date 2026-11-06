@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coprime Numbers</title>
+<style>
+  :root {
+    --bg: #f5f6fa; --card: #ffffff; --ink: #1c2333; --muted: #5b6477;
+    --line: #c9d0e0; --accent: #3355d6; --accent-ink: #ffffff;
+    --soft: #eef1fb; --good: #1f7a37; --good-bg: #e4f5e9; --bad: #b42323; --bad-bg: #fdeaea;
+    --info-bg: #dfe7ff; --share: #b25e00; --share-bg: #fff1dc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151d; --card: #1b2030; --ink: #e8ecf6; --muted: #9aa5bd;
+      --line: #394261; --accent: #7b96ff; --accent-ink: #0d1226;
+      --soft: #232a40; --good: #6fd68b; --good-bg: #1b3326; --bad: #ff8c8c; --bad-bg: #3a1c1c;
+      --info-bg: #2a3558; --share: #ffb43b; --share-bg: #3a2e12;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 1.5rem; margin: 0 0 12px; }
+  .card { background: var(--card); border-radius: 14px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+  .goal { font-size: 1.2rem; }
+  .goal b { font-size: 1.9rem; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  button { font: inherit; cursor: pointer; }
+  .btn { border: 2px solid var(--accent); background: transparent; color: var(--accent); border-radius: 10px; padding: 6px 12px; font-weight: 600; font-size: .95rem; }
+  .btn.sm { padding: 4px 10px; font-size: .85rem; }
+  .btn.lg { padding: 12px 18px; font-size: 1.1rem; flex: 1 1 120px; }
+  .btn.cta { background: var(--accent); color: var(--accent-ink); }
+  .btn:disabled { opacity: .35; cursor: default; }
+  :focus-visible { outline: 3px solid #f08c00; outline-offset: 2px; }
+  .def { margin: 10px 0 14px; color: var(--muted); font-size: .95rem; }
+
+  .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .panel { border: 2px solid var(--line); border-radius: 12px; padding: 12px; background: var(--card); }
+  .panel.done { border-color: var(--good); }
+  .panel h2 { margin: 0 0 2px; font-size: 1.05rem; }
+  .prog { color: var(--muted); font-size: .85rem; margin-bottom: 8px; }
+  .panel.done .prog { color: var(--good); font-weight: 700; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 34px; margin-bottom: 8px; }
+  .chip { padding: 3px 10px; border-radius: 999px; background: var(--soft); border: 2px solid var(--line); font-weight: 700; font-size: 1.05rem; }
+  .chip.share { background: var(--share-bg); border-color: var(--share); color: var(--share); }
+  .entry { display: flex; gap: 8px; }
+  input[type=number] {
+    width: 100%; min-width: 0; font: inherit; font-size: 1.2rem; font-weight: 700; text-align: center; padding: 5px;
+    border-radius: 10px; border: 2px dashed var(--accent); background: var(--card); color: var(--ink); -moz-appearance: textfield;
+  }
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .err { margin-top: 8px; padding: 6px 10px; border-radius: 10px; background: var(--bad-bg); color: var(--bad); font-size: .9rem; line-height: 1.3; }
+  .note { margin-top: 8px; padding: 6px 10px; border-radius: 10px; background: var(--info-bg); font-size: .9rem; line-height: 1.4; }
+
+  .decide { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--soft); }
+  .decide p { margin: 0 0 8px; font-weight: 700; font-size: 1.1rem; }
+  .decide .legend { margin: 8px 0 0; font-weight: 400; font-size: .9rem; color: var(--muted); }
+  .verdict { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--good-bg); }
+  .verdict p { margin: 0 0 8px; font-size: 1.1rem; }
+  @media (max-width: 560px) {
+    body { font-size: 16px; } main { padding: 12px 8px 32px; } .card { padding: 12px; }
+    .panels { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Coprime Numbers</h1>
+  <div class="card">
+    <div class="top">
+      <div class="goal">Are <b id="a">?</b> and <b id="b">?</b> coprime?</div>
+      <div class="row">
+        <button class="btn sm" id="showme">Show me</button>
+        <button class="btn sm" id="newNum">New numbers</button>
+      </div>
+    </div>
+    <p class="def">Two numbers are coprime if the only factor they share is 1. List the factors of each number to find out.</p>
+    <div class="panels" id="panels"></div>
+    <div id="after"></div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var A, B, FA, FB, listA, listB, noteA, noteB, errA, errB, status, wrongMsg;   // status: 'work' | 'correct' | 'shown'
+
+  var $a = document.getElementById('a'), $b = document.getElementById('b');
+  var $panels = document.getElementById('panels'), $after = document.getElementById('after'), $show = document.getElementById('showme');
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function gcd(x, y) { while (y) { var t = x % y; x = y; y = t; } return x; }
+  function factors(n) { var f = []; for (var i = 1; i <= n; i++) if (n % i === 0) f.push(i); return f; }
+  function joinList(a) { return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; }
+  function isPrime(n) { return n > 1 && factors(n).length === 2; }
+
+  /* ---------- picking two numbers (2 to 200) ---------- */
+  // About half coprime, half not. Lists stay a manageable length (16 factors or fewer).
+  function pickPair(prevA, prevB) {
+    var wantCoprime = Math.random() < 0.5;
+    for (var tries = 0; tries < 20000; tries++) {
+      var a = rnd(2, 200), b = rnd(2, 200);
+      if (a === b || (a === prevA && b === prevB)) continue;
+      if (factors(a).length > 16 || factors(b).length > 16) continue;
+      var g = gcd(a, b);
+      if (wantCoprime !== (g === 1)) continue;
+      // make the questions interesting: usually both numbers have more than 2 factors
+      if (Math.random() < 0.8 && (isPrime(a) || isPrime(b))) continue;
+      if (!wantCoprime && g > 1 && Math.random() < 0.4 && g === Math.min(a, b) ) continue;   // not just "one divides the other"
+      return [a, b];
+    }
+    return [8, 15];
+  }
+
+  function begin(a, b) {
+    var p = a && b ? [a, b] : pickPair(A, B);
+    A = p[0]; B = p[1]; FA = factors(A); FB = factors(B);
+    listA = []; listB = []; noteA = noteB = ''; errA = errB = ''; status = 'work'; wrongMsg = '';
+    $a.textContent = A; $b.textContent = B;
+    render();
+  }
+
+  function done(list, F) { return list.length === F.length; }
+  function commons() { return FA.filter(function (f) { return FB.indexOf(f) >= 0; }); }
+
+  /* ---------- rendering ---------- */
+  function panel(which) {
+    var n = which === 'A' ? A : B, F = which === 'A' ? FA : FB, list = which === 'A' ? listA : listB;
+    var err = which === 'A' ? errA : errB, note = which === 'A' ? noteA : noteB;
+    var complete = done(list, F), p = el('div', 'panel' + (complete ? ' done' : ''));
+    p.appendChild(el('h2', null, 'Factors of ' + n));
+    p.appendChild(el('div', 'prog', complete ? '✓ All ' + F.length + ' factors found' : 'Found ' + list.length + ' of ' + F.length));
+    var chips = el('div', 'chips'), shared = both() ? commons() : [];
+    list.forEach(function (f) { chips.appendChild(el('span', 'chip' + (shared.indexOf(f) >= 0 ? ' share' : ''), f)); });
+    p.appendChild(chips);
+    if (!complete) {
+      var entry = el('div', 'entry'), inp = el('input'); inp.type = 'number'; inp.min = 1; inp.inputMode = 'numeric'; inp.id = 'in' + which;
+      inp.setAttribute('aria-label', 'Type a factor of ' + n);
+      var add = el('button', 'btn sm', 'Add');
+      function go() { addFactor(which, inp.value); }
+      add.addEventListener('click', go);
+      inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+      entry.appendChild(inp); entry.appendChild(add); p.appendChild(entry);
+    }
+    if (err) p.appendChild(el('div', 'err', err));
+    if (note) p.appendChild(el('div', 'note', note));
+    return p;
+  }
+  function both() { return done(listA, FA) && done(listB, FB); }
+
+  function render() {
+    $panels.innerHTML = ''; $after.innerHTML = '';
+    $panels.appendChild(panel('A')); $panels.appendChild(panel('B'));
+    $show.disabled = status !== 'work';
+
+    if (!both()) {
+      var first = done(listA, FA) ? document.getElementById('inB') : document.getElementById('inA');
+      if (first && matchMedia('(pointer: fine)').matches) first.focus({ preventScroll: true });
+      return;
+    }
+    if (status === 'work') {
+      var d = el('div', 'decide'); d.appendChild(el('p', null, 'Are ' + A + ' and ' + B + ' coprime?'));
+      var r = el('div', 'row');
+      [['Yes', true], ['No', false]].forEach(function (k) {
+        var b = el('button', 'btn lg', k[0]); b.addEventListener('click', function () { answer(k[1]); }); r.appendChild(b);
+      });
+      d.appendChild(r);
+      if (wrongMsg) d.appendChild(el('div', 'err', wrongMsg));
+      d.appendChild(el('p', 'legend', 'The orange factors are the ones both numbers share.'));
+      $after.appendChild(d);
+    } else {
+      var v = el('div', 'verdict');
+      v.appendChild(el('p', null, (status === 'correct' ? '✅ Correct! ' : 'Here is the answer: ') + explain()));
+      var nx = el('button', 'btn cta', 'Try other numbers'); nx.addEventListener('click', function () { begin(); });
+      v.appendChild(nx); $after.appendChild(v);
+      nx.focus({ preventScroll: true });
+      v.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function explain() {
+    var c = commons();
+    if (c.length === 1) return A + ' and ' + B + ' are coprime, because the only factor they share is 1.';
+    return A + ' and ' + B + ' are not coprime. They share the factors ' + joinList(c) + ', so they have more in common than just 1. (Their greatest common factor is ' + c[c.length - 1] + '.)';
+  }
+
+  /* ---------- actions ---------- */
+  function addFactor(which, raw) {
+    var n = which === 'A' ? A : B, list = which === 'A' ? listA : listB, v = parseInt(raw, 10), msg = '';
+    if (isNaN(v)) msg = 'Type a number first.';
+    else if (v < 1 || v > n) msg = 'A factor of ' + n + ' has to be between 1 and ' + n + '.';
+    else if (list.indexOf(v) >= 0) msg = 'You already listed ' + v + '.';
+    else if (n % v !== 0) msg = v + ' is not a factor of ' + n + ': ' + v + ' does not go into ' + n + ' evenly.';
+    if (msg) { setErr(which, msg); return; }
+    list.push(v); list.sort(function (x, y) { return x - y; });
+    setErr(which, '', true);
+    render();
+    var next = document.getElementById('in' + which); if (next && matchMedia('(pointer: fine)').matches) next.focus({ preventScroll: true });
+  }
+  function setErr(which, msg, silent) {
+    if (which === 'A') errA = msg; else errB = msg;
+    if (!silent) { render(); var i = document.getElementById('in' + which); if (i && matchMedia('(pointer: fine)').matches) i.focus({ preventScroll: true }); }
+  }
+
+  function answer(yes) {
+    var truth = commons().length === 1;
+    if (yes === truth) { status = 'correct'; wrongMsg = ''; }
+    else { wrongMsg = 'Not quite. Look at the factors that appear in both lists. Do the numbers share anything besides 1?'; }
+    render();
+  }
+
+  function pairsText(n, F) {
+    return 'Factors come in pairs: ' + F.filter(function (f) { return f * f <= n; }).map(function (f) { return f + ' × ' + (n / f); }).join(', ') + '.';
+  }
+  function showMe() {
+    if (!done(listA, FA)) { listA = FA.slice(); errA = ''; noteA = pairsText(A, FA); }
+    else if (!done(listB, FB)) { listB = FB.slice(); errB = ''; noteB = pairsText(B, FB); }
+    else { status = 'shown'; }
+    render();
+  }
+
+  $show.addEventListener('click', showMe);
+  document.getElementById('newNum').addEventListener('click', function () { begin(); });
+
+  // optional: ?a=84&b=55 in the URL sets the numbers (handy for teachers)
+  var P = new URLSearchParams(location.search), qa = parseInt(P.get('a'), 10), qb = parseInt(P.get('b'), 10);
+  if (qa >= 2 && qa <= 200 && qb >= 2 && qb <= 200 && qa !== qb) begin(qa, qb); else begin();
+})();
+</script>
+</body>
+</html>
